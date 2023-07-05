@@ -1,18 +1,20 @@
 import { Schema, Types, model } from "mongoose";
-import Place from "../models/place";
+import Place, { PlaceOwner } from "../models/place";
 
 interface PlaceSchema {
     name: string,
-    ownerId: Types.ObjectId,
+    owner: Types.ObjectId,
+    location: [number, number],
     photoSrcs: string[],
-    reviewIds: Types.ObjectId[],
+    reviews: Types.ObjectId[],
 }
 
 const schema = new Schema<PlaceSchema>({
     name: String,
-    ownerId: { type: Schema.Types.ObjectId, ref: "users" },
+    owner: { type: Schema.Types.ObjectId, ref: "users" },
+    location: [Number, Number],
     photoSrcs: [String],
-    reviewIds: { type: [Schema.Types.ObjectId], ref: "reviews" },
+    reviews: { type: [Schema.Types.ObjectId], ref: "reviews" },
 });
 
 const DBPlace = model("places", schema);
@@ -20,24 +22,25 @@ const DBPlace = model("places", schema);
 const createPlaceAsync = async (ownerId: string, name: string) => { 
     await new DBPlace({
         name: name,
-        ownerId: Types.ObjectId.createFromHexString(ownerId),
+        owner: Types.ObjectId.createFromHexString(ownerId),
         photoSrcs: [],
-        reviewIds: [],
+        reviews: [],
     }).save();
 };
 
-const readAllPlaces = async (): Promise<Place[]> => {
-    const places = await DBPlace.find({});
+const readAllPlacesAsync = async (): Promise<Place[]> => {
+    const places = await DBPlace.find({}).populate<{ owner: PlaceOwner }>("owner");
     return places.map(place => ({
         id: place._id.toHexString(),
         name: place.name,
-        ownerId: place.ownerId.toHexString(),
+        owner: place.owner,
+        location: place.location,
         photoSrcs: place.photoSrcs,
-        reviewIds: place.reviewIds.map(id => id.toHexString())
+        reviews: place.reviews.map(id => id.toHexString())
     }));
 };
 
 export {
     createPlaceAsync,
-    readAllPlaces
+    readAllPlacesAsync
 }
