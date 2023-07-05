@@ -9,20 +9,20 @@ interface UserSchema {
     salt: string,
 }
 
-const schema = new Schema<UserSchema>({
+const userSchema = new Schema<UserSchema>({
     username: String,
     email: { type: String, unique: true },
     password: String,
     salt: String,
 });
 
-const DBUser = model("users", schema);
+const DBUser = model("users", userSchema);
 
-const createUserAsync = async (name: string, email: string, password: string) => {
+const createUserAsync = async (username: string, email: string, password: string) => {
     console.log("Registering user " + email);
     const encryptedData = encryptPassword(password);
     await new DBUser({
-        name: name,
+        username: username,
         email: email,
         password: encryptedData.hash,
         salt: encryptedData.salt
