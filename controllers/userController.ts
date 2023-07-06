@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import { Schema, Types, model } from "mongoose";
 import User from "../models/user";
 import { encryptPassword } from "../lib/crypt";
 
@@ -40,7 +40,19 @@ const searchUserByEmailAsync = async (email: string): Promise<User | null> => {
     } : null;
 };
 
+const readUserAsync = async (id: string): Promise<User | null> => {
+    const user = await DBUser.findOne({ _id: Types.ObjectId.createFromHexString(id) });
+    return !!user ? {
+        id: user._id.toHexString(),
+        username: user.username,
+        email: user.email,
+        password: user.password,
+        salt: user.salt,
+    } : null;
+};
+
 export {
     createUserAsync,
-    searchUserByEmailAsync
+    searchUserByEmailAsync,
+    readUserAsync
 }

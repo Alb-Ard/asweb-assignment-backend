@@ -1,0 +1,1 @@
+export const getSessionToken = (cookieString?: string) => cookieString?.split("; ").find(c => c.startsWith("sessionToken="))?.split("=")[1];

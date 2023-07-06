@@ -12,7 +12,11 @@ const startApp = async () => {
     await connectToDbAsync();
     const app = express();
     app.use(bodyParser.json());
-    app.use(cors());
+    app.use(bodyParser.text());
+    app.use(cors({
+        origin: "http://localhost:3000",
+        credentials: true
+    }));
     app.use(userRoutes);
     app.listen(3001, "localhost", 1, () => console.log("Listening on localhost:3001"));
 }
