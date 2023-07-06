@@ -25,7 +25,7 @@ placeRoutes.put("/api/place", async (request, response) => {
 
 placeRoutes.get("/api/place/", async (request, response) => {
     try {
-        const places = await readAllPlacesAsync();
+        const places = await readAllPlacesAsync(Number(request.query.page ?? "0"));
         response.send(places);
     } catch (err) {
         console.error(err);

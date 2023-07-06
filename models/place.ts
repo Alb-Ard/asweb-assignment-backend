@@ -1,17 +1,16 @@
-import User from "./user";
-
 interface Place {
-    id: string,
-    owner: PlaceOwner,
-    name: string,
-    location: [number, number],
-    photoSrcs: string[],
-    reviews: string[],
+    readonly id: string,
+    readonly owner: PlaceOwner,
+    readonly name: string,
+    readonly description: string
+    readonly location: [number, number],
+    readonly photoSrcs: string[],
+    readonly reviews: string[],
 }
 
 interface PlaceOwner {
-    id: string,
-    name: string
+    readonly id: string,
+    readonly username: string
 }
 
 export default Place;
