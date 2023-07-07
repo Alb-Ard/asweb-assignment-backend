@@ -17,11 +17,11 @@ const itinerarySchema = new Schema<ItinerarySchema>({
 const DBItinerary = model("itineraries", itinerarySchema);
 
 const createItineraryAsync = async (ownerId: string, name: string) => { 
-    await new DBItinerary({
+    return (await new DBItinerary({
         name: name,
         owner: Types.ObjectId.createFromHexString(ownerId),
         places: [],
-    }).save();
+    }).save())?._id?.toHexString();
 };
 
 const readAllItinerariesAsync = async (ownerId: string, page: number): Promise<Itinerary[]> => {
@@ -57,9 +57,15 @@ const updateItineraryAsync = async (itinerary: Partial<Itinerary> & { id: string
     return result.modifiedCount > 0;
 };
 
+const deleteItineraryAsync = async (id: string): Promise<boolean> => {
+    const result = await DBItinerary.deleteOne({ _id: Types.ObjectId.createFromHexString(id) });
+    return result.deletedCount > 0;
+};
+
 export {
     createItineraryAsync,
     readAllItinerariesAsync,
     readItineraryAsync,
     updateItineraryAsync,
+    deleteItineraryAsync,
 }

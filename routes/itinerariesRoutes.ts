@@ -2,7 +2,8 @@ import express from "express";
 import { createPlaceAsync, readAllPlacesAsync } from "../controllers/placeController";
 import { getSessionUserAsync } from "../controllers/sessionController";
 import { getSessionToken } from "../lib/auth";
-import { createItineraryAsync, readAllItinerariesAsync, readItineraryAsync, updateItineraryAsync } from "../controllers/itineraryController";
+import { createItineraryAsync, deleteItineraryAsync, readAllItinerariesAsync, readItineraryAsync, updateItineraryAsync } from "../controllers/itineraryController";
+import Itinerary from "../models/itinerary";
 
 const itineraryRoutes = express.Router();
 
@@ -17,7 +18,12 @@ itineraryRoutes.post("/api/itinerary", async (request, response) => {
             response.sendStatus(401);
             return;
         }
-        await createItineraryAsync(itinerary.owner, itinerary.name);
+        const createdId = await createItineraryAsync(itinerary.owner, itinerary.name);
+        if (!!!createdId) {
+            response.sendStatus(500);
+            return;
+        }
+        response.send(createdId);
     } catch (err) {
         console.error(err);
         response.status(500).send(err);
@@ -73,6 +79,32 @@ itineraryRoutes.post("/api/itinerary/:id/places", async (request, response) => {
             return;
         }
         const success = await updateItineraryAsync({ id: itineraryId, places: [...itinerary.places, placeId] });
+        response.sendStatus(success ? 200 : 500);
+    } catch (err) {
+        console.error(err);
+        response.status(500).send(err);
+    }
+});
+
+itineraryRoutes.patch("/api/itinerary/:id", async (request, response) => {
+    try {
+        const itineraryId = request.params.id;
+        const itinerary = await readItineraryAsync(itineraryId);
+        if (!!!itinerary) {
+            response.status(404).send("Itinerary not found");
+            return;
+        }
+        const sessionUserId = await getSessionUserAsync(getSessionToken(request.headers.cookie));
+        if (!!!sessionUserId || itinerary.owner.id !== sessionUserId) {
+            response.sendStatus(401);
+            return;
+        }
+        const { id: bodyItineraryId, ...itineraryData } = request.body as Partial<Itinerary>;
+        if (!!!itineraryData) {
+            response.sendStatus(400);
+            return;
+        }
+        const success = await updateItineraryAsync({ id: itineraryId, ...itineraryData });
         response.sendStatus(success ? 200 : 500);
     } catch (err) {
         console.error(err);
@@ -136,6 +168,27 @@ itineraryRoutes.delete("/api/itinerary/:itineraryId/places/:placeId", async (req
             return;
         }
         const success = await updateItineraryAsync({ id: itineraryId, places: [...itinerary.places.filter(i => i.id !== placeId)] });
+        response.sendStatus(success ? 200 : 500);
+    } catch (err) {
+        console.error(err);
+        response.status(500).send(err);
+    }
+});
+
+itineraryRoutes.delete("/api/itinerary/:id", async (request, response) => {
+    try {
+        const itineraryId = request.params.id;
+        const itinerary = await readItineraryAsync(itineraryId);
+        if (!!!itinerary) {
+            response.sendStatus(404);
+            return;
+        }
+        const sessionUserId = await getSessionUserAsync(getSessionToken(request.headers.cookie));
+        if (!!!sessionUserId || itinerary.owner.id !== sessionUserId) {
+            response.sendStatus(401);
+            return;
+        }
+        const success = await deleteItineraryAsync(itineraryId);
         response.sendStatus(success ? 200 : 500);
     } catch (err) {
         console.error(err);

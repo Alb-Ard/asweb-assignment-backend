@@ -18,8 +18,12 @@ placeRoutes.post("/api/place", async (request, response) => {
             response.sendStatus(401);
             return;
         }
-        await createPlaceAsync(place.owner, place.name, place.location);
-        response.sendStatus(200);
+        const createdId = await createPlaceAsync(place.owner, place.name, place.location);
+        if (!!!createdId) {
+            response.sendStatus(500);
+            return;
+        }
+        response.send(createdId);
     } catch (err) {
         console.error(err);
         response.status(500).send(err);

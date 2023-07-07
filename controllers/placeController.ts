@@ -23,14 +23,14 @@ const placeSchema = new Schema<PlaceSchema>({
 const DBPlace = model("places", placeSchema);
 
 const createPlaceAsync = async (ownerId: string, name: string, location: [number, number]) => { 
-    await new DBPlace({
+    return (await new DBPlace({
         name: name,
         description: "",
         location: location,
         owner: Types.ObjectId.createFromHexString(ownerId),
         photoSrcs: [],
         reviews: [],
-    }).save();
+    }).save())?._id?.toHexString();
 };
 
 const readAllPlacesAsync = async (page: number): Promise<Place[]> => {
