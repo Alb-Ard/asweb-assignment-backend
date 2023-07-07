@@ -22,10 +22,11 @@ const placeSchema = new Schema<PlaceSchema>({
 
 const DBPlace = model("places", placeSchema);
 
-const createPlaceAsync = async (ownerId: string, name: string) => { 
+const createPlaceAsync = async (ownerId: string, name: string, location: [number, number]) => { 
     await new DBPlace({
         name: name,
         description: "",
+        location: location,
         owner: Types.ObjectId.createFromHexString(ownerId),
         photoSrcs: [],
         reviews: [],
@@ -49,7 +50,35 @@ const readAllPlacesAsync = async (page: number): Promise<Place[]> => {
     }));
 };
 
+const readPlaceAsync = async (id: string): Promise<Place | null> => {
+    const place = await DBPlace.findOne({ _id: Types.ObjectId.createFromHexString(id) })
+        .populate<{ owner: Owner }>("owner", "username");
+    return !!place ? {
+        id: place._id.toHexString(),
+        name: place.name,
+        description: place.description,
+        owner: place.owner,
+        location: place.location,
+        photoSrcs: place.photoSrcs,
+        reviews: place.reviews.map(id => id.toHexString())
+    } : null;
+};
+
+const updatePlaceAsync = async (place: Partial<Place> & { id: string }): Promise<boolean> => {
+    const { id: placeId, ...placeData } = place;
+    const result = await DBPlace.updateOne({ _id: Types.ObjectId.createFromHexString(placeId) }, placeData);
+    return result.modifiedCount > 0;
+};
+
+const deletePlaceAsync = async (id: string): Promise<boolean> => {
+    const result = await DBPlace.deleteOne({ _id: Types.ObjectId.createFromHexString(id) });
+    return result.deletedCount > 0;
+};
+
 export {
     createPlaceAsync,
-    readAllPlacesAsync
+    readAllPlacesAsync,
+    readPlaceAsync,
+    updatePlaceAsync,
+    deletePlaceAsync
 }

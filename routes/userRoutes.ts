@@ -6,7 +6,7 @@ import { getSessionToken } from "../lib/auth";
 
 const userRoutes = express.Router();
 
-userRoutes.put("/api/user/register", async (request, response) => {
+userRoutes.post("/api/user/register", async (request, response) => {
     try {
         const newUserData = request.body as { username: string, email: string, password: string };
         await createUserAsync(newUserData.username, newUserData.email, newUserData.password);
@@ -48,7 +48,7 @@ userRoutes.post("/api/user/login", async (request, response) => {
     }
 });
 
-userRoutes.get("/api/user/renew", async (request, response) => {
+userRoutes.post("/api/user/renew", async (request, response) => {
     try {
         console.log(request.headers.cookie);
         const token = getSessionToken(request.headers.cookie);
@@ -76,7 +76,7 @@ userRoutes.get("/api/user/renew", async (request, response) => {
     }
 });
 
-userRoutes.get("/api/user/logout", async (request, response) => {
+userRoutes.post("/api/user/logout", async (request, response) => {
     try {
         const token = getSessionToken(request.headers.cookie);
         if (await endSessionAsync(token)) {
