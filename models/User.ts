@@ -1,6 +1,6 @@
-interface User {
-    readonly id: string,
-    readonly username: string,
+import Owner from "./owner";
+
+interface User extends Owner {
     readonly email: string,
     readonly password: string,
     readonly salt: string,

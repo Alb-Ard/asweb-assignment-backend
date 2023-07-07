@@ -1,5 +1,6 @@
 import { Schema, Types, model } from "mongoose";
-import Place, { PlaceOwner } from "../models/place";
+import Place from "../models/place";
+import Owner from "../models/owner";
 
 interface PlaceSchema {
     name: string,
@@ -36,7 +37,7 @@ const readAllPlacesAsync = async (page: number): Promise<Place[]> => {
     const places = await DBPlace.find({})
         .skip(pageSize * page)
         .limit(pageSize)
-        .populate<{ owner: PlaceOwner }>("owner", "username");
+        .populate<{ owner: Owner }>("owner", "username");
     return places.map(place => ({
         id: place._id.toHexString(),
         name: place.name,

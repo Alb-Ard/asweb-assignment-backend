@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 import bodyParser from "body-parser";
 import placeRoutes from "./routes/placeRoutes";
+import itineraryRoutes from "./routes/itinerariesRoutes";
 
 const connectToDbAsync = async () => {
     await mongoose.connect("mongodb+srv://root:root@cluster0.vsfjdvq.mongodb.net/?retryWrites=true&w=majority");
@@ -20,6 +21,7 @@ const startApp = async () => {
     }));
     app.use(userRoutes);
     app.use(placeRoutes);
+    app.use(itineraryRoutes);
     app.listen(3001, "localhost", 1, () => console.log("Listening on localhost:3001"));
 }
 
