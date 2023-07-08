@@ -8,12 +8,11 @@ const itineraryRoutes = express.Router();
 
 itineraryRoutes.post("/api/itinerary", async (request, response) => { 
     try {
-        const sessionUserId = await getSessionUserAsync(getSessionToken(request.headers.cookie));
         const itinerary = request.body as {
             name: string,
             owner: string,
         };
-        if (!await checkOwnershipAsync(itinerary.owner, sessionUserId)) {
+        if (!(await checkOwnershipAsync(itinerary.owner, request.headers.cookie))) {
             response.sendStatus(401);
             return;
         }
@@ -29,7 +28,7 @@ itineraryRoutes.post("/api/itinerary", async (request, response) => {
     }
 });
 
-itineraryRoutes.get("/api/itinerary/", async (request, response) => {
+itineraryRoutes.get("/api/itinerary", async (request, response) => {
     try {
         const sessionUserId = await getSessionUserAsync(getSessionToken(request.headers.cookie));
         if (!!!sessionUserId) {
@@ -52,7 +51,7 @@ itineraryRoutes.get("/api/itinerary/:id", async (request, response) => {
             response.sendStatus(404);
             return;
         }
-        if (!await checkOwnershipAsync(itinerary.owner._id, request.headers.cookie)) {
+        if (!(await checkOwnershipAsync(itinerary.owner._id, request.headers.cookie))) {
             response.sendStatus(401);
             return;
         }
@@ -71,7 +70,7 @@ itineraryRoutes.post("/api/itinerary/:id/places", async (request, response) => {
             response.status(404).send("Itinerary not found");
             return;
         }
-        if (!await checkOwnershipAsync(itinerary.owner._id, request.headers.cookie)) {
+        if (!(await checkOwnershipAsync(itinerary.owner._id, request.headers.cookie))) {
             response.sendStatus(401);
             return;
         }
@@ -96,7 +95,7 @@ itineraryRoutes.patch("/api/itinerary/:id", async (request, response) => {
             response.status(404).send("Itinerary not found");
             return;
         }
-        if (!await checkOwnershipAsync(itinerary.owner._id, request.headers.cookie)) {
+        if (!(await checkOwnershipAsync(itinerary.owner._id, request.headers.cookie))) {
             response.sendStatus(401);
             return;
         }
@@ -121,7 +120,7 @@ itineraryRoutes.patch("/api/itinerary/:id/places", async (request, response) => 
             response.status(404).send("Itinerary not found");
             return;
         }
-        if (!await checkOwnershipAsync(itinerary.owner._id, request.headers.cookie)) {
+        if (!(await checkOwnershipAsync(itinerary.owner._id, request.headers.cookie))) {
             response.sendStatus(401);
             return;
         }
@@ -157,7 +156,7 @@ itineraryRoutes.delete("/api/itinerary/:itineraryId/places/:placeId", async (req
             response.status(404).send("Itinerary not found");
             return;
         }
-        if (!await checkOwnershipAsync(itinerary.owner._id, request.headers.cookie)) {
+        if (!(await checkOwnershipAsync(itinerary.owner._id, request.headers.cookie))) {
             response.sendStatus(401);
             return;
         }
@@ -182,7 +181,7 @@ itineraryRoutes.delete("/api/itinerary/:id", async (request, response) => {
             response.sendStatus(404);
             return;
         }
-        if (!await checkOwnershipAsync(itinerary.owner._id, request.headers.cookie)) {
+        if (!(await checkOwnershipAsync(itinerary.owner._id, request.headers.cookie))) {
             response.sendStatus(401);
             return;
         }

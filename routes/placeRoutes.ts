@@ -66,7 +66,7 @@ placeRoutes.patch("/api/place/:id", async (request, response) => {
             response.sendStatus(400);
             return;
         }
-        if (!!!await readPlaceAsync(place._id)) {
+        if (!!!(await readPlaceAsync(place._id))) {
             response.sendStatus(404);
             return;
         }
@@ -81,7 +81,7 @@ placeRoutes.patch("/api/place/:id", async (request, response) => {
 placeRoutes.delete("/api/place/:id", async (request, response) => {
     try {
         const placeId = request.params.id;
-        if (!!!await readPlaceAsync(placeId)) {
+        if (!!!(await readPlaceAsync(placeId))) {
             response.sendStatus(404);
             return;
         }

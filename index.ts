@@ -5,6 +5,7 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import placeRoutes from "./routes/placeRoutes";
 import itineraryRoutes from "./routes/itinerariesRoutes";
+import { getSessionToken } from "./lib/auth";
 
 const connectToDbAsync = async () => {
     await mongoose.connect("mongodb+srv://root:root@cluster0.vsfjdvq.mongodb.net/?retryWrites=true&w=majority");
@@ -20,7 +21,7 @@ const startApp = async () => {
         credentials: true
     }));
     app.use((req, res, next) => {
-        console.log(`${req.method} to ${req.url} with body ${JSON.stringify(req.body)}`);
+        console.log(`${req.method} to ${req.url} with token ${getSessionToken(req.headers.cookie)} with body ${JSON.stringify(req.body)}`);
         next();
     })
     app.use(userRoutes);
