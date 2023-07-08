@@ -1,6 +1,7 @@
 import { Schema, Types, model } from "mongoose";
 import User from "../models/user";
 import { encryptPassword } from "../lib/crypt";
+import { UpdateFields } from "../lib/db";
 
 interface UserSchema {
     username: string,
@@ -51,8 +52,21 @@ const readUserAsync = async (id: string): Promise<User | null> => {
     } : null;
 };
 
+const updateUserAsync = async (id: string, data: UpdateFields<User>) => {
+    const result = await DBUser.updateOne({ _id: Types.ObjectId.createFromHexString(id) }, data);
+    return result.matchedCount > 0;
+}
+
+const deleteUserAsync = async (id: string) => {
+    const result = await DBUser.deleteOne({ _id: Types.ObjectId.createFromHexString(id) });
+    return result.deletedCount > 0;
+}
+
+
 export {
     createUserAsync,
     searchUserByEmailAsync,
-    readUserAsync
+    readUserAsync,
+    updateUserAsync,
+    deleteUserAsync
 }

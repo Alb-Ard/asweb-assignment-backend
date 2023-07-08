@@ -44,9 +44,9 @@ const getSessionUserAsync = async (token?: string): Promise<string | null> => {
 
 const endSessionAsync = async (token?: string): Promise<boolean> => {
     if (!!!token) {
-        return true;
+        return false;
     }
-    const result = await DBUserToken.updateOne({ token: token }, { token: invalidToken });
+    const result = await DBUserToken.updateOne({ token: token }, { token: invalidToken, expiry: 0 });
     return result.modifiedCount > 0;
 }
 
