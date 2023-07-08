@@ -3,6 +3,9 @@ import { createUserAsync, deleteUserAsync, readUserAsync, searchUserByEmailAsync
 import { checkPassword } from "../lib/crypt";
 import { endSessionAsync, getSessionUserAsync, startSessionAsync } from "../controllers/sessionController";
 import { checkOwnershipAsync, getSessionToken } from "../lib/auth";
+import { deleteReviewAsync, readUserReviewsAsync } from "../controllers/reviewController";
+import { deleteItineraryAsync, readUserItinerariesAsync } from "../controllers/itineraryController";
+import { deletePlaceAsync, readUserPlacesAsync } from "../controllers/placeController";
 
 const userRoutes = express.Router();
 
@@ -133,6 +136,34 @@ userRoutes.delete("/api/user/:id", async (request, response) => {
             return;
         }
         const success = await deleteUserAsync(userId);
+        if (success) {
+            const reviews = await readUserReviewsAsync(userId);
+            for (const review of reviews) {
+                await deleteReviewAsync(review._id);
+            }
+            let page = 0;
+            do {
+                const itineraries = await readUserItinerariesAsync(userId, page);
+                for (const itinerary of itineraries) {
+                    await deleteItineraryAsync(itinerary._id);
+                }
+                if (itineraries.length <= 0) {
+                    break;
+                }
+                page++;
+            } while (true);
+            page = 0;
+            do {
+                const places = await readUserPlacesAsync(userId, page);
+                for (const place of places) {
+                    await deletePlaceAsync(place._id);
+                }
+                if (places.length <= 0) {
+                    break;
+                }
+                page++;
+            } while (true);
+        }
         response.status(success ? 200 : 500).send(success ? "OK" : "DB Error");
     } catch (err) {
         console.error(err);

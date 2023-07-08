@@ -1,7 +1,7 @@
 import express from "express";
 import { getSessionUserAsync } from "../controllers/sessionController";
 import { checkOwnershipAsync, getSessionToken } from "../lib/auth";
-import { createItineraryAsync, deleteItineraryAsync, readAllItinerariesAsync, readItineraryAsync, updateItineraryAsync } from "../controllers/itineraryController";
+import { createItineraryAsync, deleteItineraryAsync, readUserItinerariesAsync, readItineraryAsync, updateItineraryAsync } from "../controllers/itineraryController";
 import Itinerary from "../models/itinerary";
 
 const itineraryRoutes = express.Router();
@@ -35,7 +35,7 @@ itineraryRoutes.get("/api/itinerary", async (request, response) => {
             response.sendStatus(401);
             return;
         }
-        const itineraries = await readAllItinerariesAsync(sessionUserId, Number(request.query.page ?? "0"));
+        const itineraries = await readUserItinerariesAsync(sessionUserId, Number(request.query.page ?? "0"));
         response.send(itineraries);
     } catch (err) {
         console.error(err);

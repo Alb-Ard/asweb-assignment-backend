@@ -25,7 +25,7 @@ const createItineraryAsync = async (ownerId: string, name: string) => {
     }).save())?._id?.toHexString();
 };
 
-const readAllItinerariesAsync = async (ownerId: string, page: number): Promise<Itinerary[]> => {
+const readUserItinerariesAsync = async (ownerId: string, page: number): Promise<Itinerary[]> => {
     const pageSize = 10;
     const itineraries = await DBItinerary.find({ owner: Types.ObjectId.createFromHexString(ownerId) })
         .skip(pageSize * page)
@@ -64,7 +64,7 @@ const deleteItineraryAsync = async (id: string): Promise<boolean> => {
 
 export {
     createItineraryAsync,
-    readAllItinerariesAsync,
+    readUserItinerariesAsync,
     readItineraryAsync,
     updateItineraryAsync,
     deleteItineraryAsync,

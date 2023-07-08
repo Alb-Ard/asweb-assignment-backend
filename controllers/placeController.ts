@@ -2,14 +2,14 @@ import { Schema, Types, model } from "mongoose";
 import Place from "../models/place";
 import Owner from "../models/owner";
 import { UpdateFields } from "../lib/db";
+import Review from "../models/review";
 
 interface PlaceSchema {
     name: string,
     description: string,
     owner: Types.ObjectId,
     location: [number, number],
-    photoSrcs: string[],
-    reviews: Types.ObjectId[],
+    photoSrcs: string[]
 }
 
 const placeSchema = new Schema<PlaceSchema>({
@@ -17,8 +17,7 @@ const placeSchema = new Schema<PlaceSchema>({
     description: String,
     owner: { type: Schema.Types.ObjectId, ref: "users" },
     location: [Number, Number],
-    photoSrcs: [String],
-    reviews: { type: [Schema.Types.ObjectId], ref: "reviews" },
+    photoSrcs: [String]
 });
 
 const DBPlace = model("places", placeSchema);
@@ -29,8 +28,7 @@ const createPlaceAsync = async (ownerId: string, name: string, location: [number
         description: "",
         location: location,
         owner: Types.ObjectId.createFromHexString(ownerId),
-        photoSrcs: [],
-        reviews: [],
+        photoSrcs: []
     }).save())?._id?.toHexString();
 };
 
@@ -47,7 +45,24 @@ const readAllPlacesAsync = async (page: number): Promise<Place[]> => {
         owner: place.owner,
         location: place.location,
         photoSrcs: place.photoSrcs,
-        reviews: place.reviews.map(id => id.toHexString())
+        reviews: [],
+    }));
+};
+
+const readUserPlacesAsync = async (ownerId: string, page: number): Promise<Place[]> => {
+    const pageSize = 10;
+    const places = await DBPlace.find({ owner: Types.ObjectId.createFromHexString(ownerId) })
+        .skip(pageSize * page)
+        .limit(pageSize)
+        .populate<{ owner: Owner }>("owner", "username");
+    return places.map(place => ({
+        _id: place._id.toHexString(),
+        name: place.name,
+        description: place.description,
+        owner: place.owner,
+        location: place.location,
+        photoSrcs: place.photoSrcs,
+        reviews: [],
     }));
 };
 
@@ -61,7 +76,7 @@ const readPlaceAsync = async (id: string): Promise<Place | null> => {
         owner: place.owner,
         location: place.location,
         photoSrcs: place.photoSrcs,
-        reviews: place.reviews.map(id => id.toHexString())
+        reviews: [],
     } : null;
 };
 
@@ -77,6 +92,7 @@ const deletePlaceAsync = async (id: string): Promise<boolean> => {
 
 export {
     createPlaceAsync,
+    readUserPlacesAsync,
     readAllPlacesAsync,
     readPlaceAsync,
     updatePlaceAsync,
