@@ -1,16 +1,16 @@
 import Owner from "./owner"
 
 interface Itinerary {
-    id: string,
-    owner: Owner,
-    name: string,
-    places: ItineraryPlace[]
+    readonly _id: string,
+    readonly owner: Owner,
+    readonly name: string,
+    readonly places: ItineraryPlace[]
 }
 
 interface ItineraryPlace {
-    id: string,
-    name: string,
-    location: [number, number]
+    readonly _id: string,
+    readonly name: string,
+    readonly location: [number, number]
 }
 
 export default Itinerary;

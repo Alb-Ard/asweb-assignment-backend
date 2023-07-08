@@ -56,21 +56,22 @@ placeRoutes.get("/api/place/:id", async (request, response) => {
 
 placeRoutes.patch("/api/place/:id", async (request, response) => {
     try {
-        const place = request.body as Partial<Place> & { id: string };
+        const place = request.body as Partial<Place> & { _id: string };
         if (!!!place) {
             response.sendStatus(400);
             return;
         }
-        if (place.id !== request.params.id) {
+        const { _id: placeId, ...placeData } = place;
+        if (place._id !== request.params.id) {
             response.sendStatus(400);
             return;
         }
-        if (!!!await readPlaceAsync(place.id)) {
+        if (!!!await readPlaceAsync(place._id)) {
             response.sendStatus(404);
             return;
         }
-        const success = await updatePlaceAsync(place);
-        response.sendStatus(success ? 200 : 500);
+        const success = await updatePlaceAsync(placeId, placeData);
+        response.status(success ? 200 : 500).send(success ? "OK" : "DB Error");
     } catch (err) {
         console.error(err);
         response.status(500).send(err);
@@ -85,7 +86,7 @@ placeRoutes.delete("/api/place/:id", async (request, response) => {
             return;
         }
         const success = await deletePlaceAsync(placeId);
-        response.sendStatus(success ? 200 : 500);
+        response.status(success ? 200 : 500).send(success ? "OK" : "DB Error");
     } catch (err) {
         console.error(err);
         response.status(500).send(err);

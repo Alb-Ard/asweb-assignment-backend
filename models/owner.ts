@@ -1,5 +1,5 @@
 interface Owner {
-    readonly id: string,
+    readonly _id: string,
     readonly username: string
 }
 

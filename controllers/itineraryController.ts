@@ -1,6 +1,7 @@
 import { Schema, Types, model } from "mongoose";
 import Owner from "../models/owner";
 import Itinerary, { ItineraryPlace } from "../models/itinerary";
+import { UpdateFields } from "../lib/db";
 
 interface ItinerarySchema {
     owner: Types.ObjectId,
@@ -29,31 +30,30 @@ const readAllItinerariesAsync = async (ownerId: string, page: number): Promise<I
     const itineraries = await DBItinerary.find({ owner: Types.ObjectId.createFromHexString(ownerId) })
         .skip(pageSize * page)
         .limit(pageSize)
-        .populate<{ owner: Owner }>("owner", "username")
-        .populate<{ places: ItineraryPlace[] }>("places", ["name", "location"]);
+        .populate<{ owner: Owner }>([{ path: "owner", select: "username" }])
+        .populate<{ places: ItineraryPlace[] }>([{ path: "places", select: ["name", "location"] }])
     return itineraries.map(itinerary => ({
-        id: itinerary._id.toHexString(),
+        _id: itinerary._id.toHexString(),
         name: itinerary.name,
         owner: itinerary.owner,
-        places: itinerary.places
+        places: itinerary.places,
     }));
 };
 
 const readItineraryAsync = async (id: string): Promise<Itinerary | null> => {
     const itinerary = await DBItinerary.findOne({ _id: Types.ObjectId.createFromHexString(id) })
-        .populate<{ owner: Owner }>("owner", "username")
-        .populate<{ places: ItineraryPlace[] }>("places", ["name", "location"]);
+        .populate<{ owner: Owner }>([{ path: "owner", select: "username" }])
+        .populate<{ places: ItineraryPlace[] }>([{ path: "places", select: ["name", "location"] }])
     return !!itinerary ? {
-        id: itinerary._id.toHexString(),
+        _id: itinerary._id.toHexString(),
         name: itinerary.name,
         owner: itinerary.owner,
         places: itinerary.places
     } : null;
 };
 
-const updateItineraryAsync = async (itinerary: Partial<Itinerary> & { id: string }): Promise<boolean> => {
-    const { id: itineraryId, ...itineraryData } = itinerary;
-    const result = await DBItinerary.updateOne({ _id: Types.ObjectId.createFromHexString(itineraryId) }, itineraryData);
+const updateItineraryAsync = async (id: string, data: UpdateFields<Itinerary>): Promise<boolean> => {
+    const result = await DBItinerary.updateOne({ _id: Types.ObjectId.createFromHexString(id) }, data);
     return result.modifiedCount > 0;
 };
 

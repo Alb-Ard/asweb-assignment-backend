@@ -19,6 +19,10 @@ const startApp = async () => {
         origin: "http://localhost:3000",
         credentials: true
     }));
+    app.use((req, res, next) => {
+        console.log(`${req.method} to ${req.url} with body ${JSON.stringify(req.body)}`);
+        next();
+    })
     app.use(userRoutes);
     app.use(placeRoutes);
     app.use(itineraryRoutes);

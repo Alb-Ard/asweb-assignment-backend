@@ -12,6 +12,7 @@ userRoutes.post("/api/user/register", async (request, response) => {
         await createUserAsync(newUserData.username, newUserData.email, newUserData.password);
         response.sendStatus(200);
     } catch (err) {
+        console.error(err);
         response.status(500).send(err);
     }
 });
@@ -24,12 +25,12 @@ userRoutes.post("/api/user/login", async (request, response) => {
             const receivedToken = getSessionToken(request.headers.cookie);
             const currentLoggedUserId = await getSessionUserAsync(receivedToken);
             const { password, salt, ...userData } = user;
-            if (currentLoggedUserId === user.id) {
+            if (currentLoggedUserId == user._id) {
                 // Session is already active
                 response.send(userData);
                 return;
             }
-            const sessionToken = await startSessionAsync(user.id);
+            const sessionToken = await startSessionAsync(user._id);
             response
                 .cookie("sessionToken", sessionToken.token, {
                     domain: request.hostname,
@@ -40,7 +41,7 @@ userRoutes.post("/api/user/login", async (request, response) => {
                 })
                 .send(userData);
         } else {
-            response.sendStatus(403);
+            response.sendStatus(401);
         }
     } catch (err) {
         console.error(err);

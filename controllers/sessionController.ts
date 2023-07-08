@@ -35,7 +35,7 @@ const startSessionAsync = async (userId: string): Promise<{ token: string, expir
 }
 
 const getSessionUserAsync = async (token?: string): Promise<string | null> => {
-    if (!!!token || token === invalidToken) {
+    if (!!!token || token == invalidToken) {
         return null;
     }
     const userToken = await DBUserToken.findOne({ token: token }).where("expiry").gte(Date.now());

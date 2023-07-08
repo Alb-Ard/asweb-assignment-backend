@@ -32,7 +32,7 @@ const createUserAsync = async (username: string, email: string, password: string
 const searchUserByEmailAsync = async (email: string): Promise<User | null> => {
     const user = await DBUser.findOne({ email: email });
     return !!user ? {
-        id: user._id.toHexString(),
+        _id: user._id.toHexString(),
         username: user.username,
         email: user.email,
         password: user.password,
@@ -43,7 +43,7 @@ const searchUserByEmailAsync = async (email: string): Promise<User | null> => {
 const readUserAsync = async (id: string): Promise<User | null> => {
     const user = await DBUser.findOne({ _id: Types.ObjectId.createFromHexString(id) });
     return !!user ? {
-        id: user._id.toHexString(),
+        _id: user._id.toHexString(),
         username: user.username,
         email: user.email,
         password: user.password,

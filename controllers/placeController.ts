@@ -1,6 +1,7 @@
 import { Schema, Types, model } from "mongoose";
 import Place from "../models/place";
 import Owner from "../models/owner";
+import { UpdateFields } from "../lib/db";
 
 interface PlaceSchema {
     name: string,
@@ -40,7 +41,7 @@ const readAllPlacesAsync = async (page: number): Promise<Place[]> => {
         .limit(pageSize)
         .populate<{ owner: Owner }>("owner", "username");
     return places.map(place => ({
-        id: place._id.toHexString(),
+        _id: place._id.toHexString(),
         name: place.name,
         description: place.description,
         owner: place.owner,
@@ -54,7 +55,7 @@ const readPlaceAsync = async (id: string): Promise<Place | null> => {
     const place = await DBPlace.findOne({ _id: Types.ObjectId.createFromHexString(id) })
         .populate<{ owner: Owner }>("owner", "username");
     return !!place ? {
-        id: place._id.toHexString(),
+        _id: place._id.toHexString(),
         name: place.name,
         description: place.description,
         owner: place.owner,
@@ -64,9 +65,8 @@ const readPlaceAsync = async (id: string): Promise<Place | null> => {
     } : null;
 };
 
-const updatePlaceAsync = async (place: Partial<Place> & { id: string }): Promise<boolean> => {
-    const { id: placeId, ...placeData } = place;
-    const result = await DBPlace.updateOne({ _id: Types.ObjectId.createFromHexString(placeId) }, placeData);
+const updatePlaceAsync = async (id: string, data: UpdateFields<Place>): Promise<boolean> => {
+    const result = await DBPlace.updateOne({ _id: Types.ObjectId.createFromHexString(id) }, data);
     return result.modifiedCount > 0;
 };
 

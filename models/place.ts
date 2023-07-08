@@ -1,7 +1,7 @@
 import Owner from "./owner";
 
 interface Place {
-    readonly id: string,
+    readonly _id: string,
     readonly owner: Owner,
     readonly name: string,
     readonly description: string
