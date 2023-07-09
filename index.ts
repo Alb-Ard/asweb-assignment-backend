@@ -34,14 +34,18 @@ const createExpressApp = () => {
     app.use(placeRoutes);
     app.use(itineraryRoutes);
 
-    for (const arg of process.argv) {
-        if (arg.includes("dev")) {
-            console.log("Redirect to dev at port " + devServerPort + " enabled!");
-            app.get("/", (req, res) => {
-                res.redirect(`http://${req.hostname}:${devServerPort}`);
-            });
-            break;
-        }
+    const isDev = process.argv.includes("dev");
+    if (isDev) {
+        console.log("Redirect to dev at port " + devServerPort + " enabled!");
+        app.get("/", (req, res) => {
+            res.redirect(`http://${req.hostname}:${devServerPort}`);
+        });
+    } else {
+        console.log("Started in production mode");
+        app.use(express.static("static"));
+        app.get("/*", (req, res, next) => {
+            res.sendFile(__dirname + "/static/" + req.path);
+        });
     }
 
     return app;
