@@ -1,6 +1,6 @@
 import {model, Schema, Types} from "mongoose";
 import Review  from "../models/review";
-import {UpdateFields, WithObjectId, withStringId} from "../lib/db";
+import {mapOwner, UpdateFields, WithObjectId} from "../lib/db";
 import Owner from "../models/owner";
 
 interface ReviewSchema {
@@ -30,7 +30,7 @@ const readReviewAsync = async (placeId: string, userId: string): Promise<Review 
         .populate<{ user: WithObjectId<Owner> }>("user", ["username"]);
     return !!review ? {
         _id: review._id.toHexString(),
-        user: withStringId(review.user),
+        user: mapOwner(review.user),
         star: review.star,
     } : null;
 }
@@ -41,7 +41,7 @@ const readPlaceReviewsAsync = async (placeId: string): Promise<Review[]> => {
         .populate<{ user: WithObjectId<Owner> }>("user", ["username"]);
     return reviews.map(review => ({
         _id: review._id.toHexString(),
-        user: withStringId(review.user),
+        user: mapOwner(review.user),
         star: review.star,
     }));
 }
@@ -51,7 +51,7 @@ const readUserReviewsAsync = async (userId: string): Promise<Review[]> => {
         .populate<{ user: WithObjectId<Owner> }>("user", ["username"]);
     return reviews.map(review => ({
         _id: review._id.toHexString(),
-        user: withStringId(review.user),
+        user: mapOwner(review.user),
         star: review.star,
     }));
 }

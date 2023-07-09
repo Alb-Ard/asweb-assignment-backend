@@ -1,8 +1,7 @@
 import { Schema, Types, model } from "mongoose";
 import Place from "../models/place";
 import Owner from "../models/owner";
-import { UpdateFields, WithObjectId, withStringId } from "../lib/db";
-import Review from "../models/review";
+import { UpdateFields, WithObjectId, mapOwner } from "../lib/db";
 
 interface PlaceSchema {
     name: string,
@@ -42,7 +41,7 @@ const readAllPlacesAsync = async (page: number): Promise<Place[]> => {
         _id: place._id.toHexString(),
         name: place.name,
         description: place.description,
-        owner: withStringId(place.owner),
+        owner: mapOwner(place.owner),
         location: place.location,
         photoSrcs: place.photoSrcs,
         reviews: [],
@@ -59,7 +58,7 @@ const readUserPlacesAsync = async (ownerId: string, page: number): Promise<Place
         _id: place._id.toHexString(),
         name: place.name,
         description: place.description,
-        owner: withStringId(place.owner),
+        owner: mapOwner(place.owner),
         location: place.location,
         photoSrcs: place.photoSrcs,
         reviews: [],
@@ -73,7 +72,7 @@ const readPlaceAsync = async (id: string): Promise<Place | null> => {
         _id: place._id.toHexString(),
         name: place.name,
         description: place.description,
-        owner: withStringId(place.owner),
+        owner: mapOwner(place.owner),
         location: place.location,
         photoSrcs: place.photoSrcs,
         reviews: [],
