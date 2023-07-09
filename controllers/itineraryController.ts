@@ -1,7 +1,7 @@
 import { Schema, Types, model } from "mongoose";
 import Owner from "../models/owner";
 import Itinerary, { ItineraryPlace } from "../models/itinerary";
-import { UpdateFields } from "../lib/db";
+import { UpdateFields, WithObjectId, arrayWithStringId, withStringId } from "../lib/db";
 
 interface ItinerarySchema {
     owner: Types.ObjectId,
@@ -30,25 +30,25 @@ const readUserItinerariesAsync = async (ownerId: string, page: number): Promise<
     const itineraries = await DBItinerary.find({ owner: Types.ObjectId.createFromHexString(ownerId) })
         .skip(pageSize * page)
         .limit(pageSize)
-        .populate<{ owner: Owner }>([{ path: "owner", select: "username" }])
-        .populate<{ places: ItineraryPlace[] }>([{ path: "places", select: ["name", "location"] }])
+        .populate<{ owner: WithObjectId<Owner> }>([{ path: "owner", select: "username" }])
+        .populate<{ places: WithObjectId<ItineraryPlace>[] }>([{ path: "places", select: ["name", "location"] }]);
     return itineraries.map(itinerary => ({
         _id: itinerary._id.toHexString(),
         name: itinerary.name,
-        owner: itinerary.owner,
-        places: itinerary.places,
+        owner: withStringId(itinerary.owner),
+        places: arrayWithStringId(itinerary.places),
     }));
 };
 
 const readItineraryAsync = async (id: string): Promise<Itinerary | null> => {
     const itinerary = await DBItinerary.findOne({ _id: Types.ObjectId.createFromHexString(id) })
-        .populate<{ owner: Owner }>([{ path: "owner", select: "username" }])
-        .populate<{ places: ItineraryPlace[] }>([{ path: "places", select: ["name", "location"] }])
+        .populate<{ owner: WithObjectId<Owner> }>([{ path: "owner", select: "username" }])
+        .populate<{ places: WithObjectId<ItineraryPlace>[] }>([{ path: "places", select: ["name", "location"] }]);
     return !!itinerary ? {
         _id: itinerary._id.toHexString(),
         name: itinerary.name,
-        owner: itinerary.owner,
-        places: itinerary.places
+        owner: withStringId(itinerary.owner),
+        places: arrayWithStringId(itinerary.places),
     } : null;
 };
 

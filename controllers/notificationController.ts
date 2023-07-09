@@ -1,7 +1,5 @@
-import {model, Schema, Types} from "mongoose";
-import Review  from "../models/review";
-import {UpdateFields} from "../lib/db";
-import Owner from "../models/owner";
+import { model, Schema, Types } from "mongoose";
+import { UpdateFields } from "../lib/db";
 import UserNotification from "../models/userNotification";
 
 interface NotificationSchema {
@@ -23,39 +21,24 @@ const notificationSchema = new Schema<NotificationSchema>({
 const DBNotification = model("notifications", notificationSchema);
 
 const createNotificationAsync = async (targetUserId: string, text: string, timestamp: number, href?: string) => {
-    return (await new DBNotification({
+    const notification = await new DBNotification({
         user: Types.ObjectId.createFromHexString(targetUserId),
         dateTimestamp: timestamp,
         read: false,
         text: text,
         href: href
-    }).save())?._id?.toHexString();
+    }).save();
+    return !!notification ? mapNotification(notification) : null;
 };
 
 const readNotificationAsync = async (id: string): Promise<UserNotification | null> => {
-    const notification = await DBNotification.findOne({ _id: Types.ObjectId.createFromHexString(id) })
-        .populate<{ user: Owner }>("user", ["username"]);
-    return !!notification ? ({
-        _id: notification._id.toHexString(),
-        user: notification.user,
-        dateTimestamp: notification.dateTimestamp,
-        read: notification.read,
-        text: notification.text,
-        href: notification.href
-    }) : null;
+    const notification = await DBNotification.findOne({ _id: Types.ObjectId.createFromHexString(id) });
+    return !!notification ? mapNotification(notification) : null;
 }
 
 const readUserNotificationsAsync = async (userId: string): Promise<UserNotification[]> => {
-    const notifications = await DBNotification.find({ user: Types.ObjectId.createFromHexString(userId) })
-        .populate<{ user: Owner }>("user", ["username"]);
-    return notifications.map(notification => ({
-        _id: notification._id.toHexString(),
-        user: notification.user,
-        dateTimestamp: notification.dateTimestamp,
-        read: notification.read,
-        text: notification.text,
-        href: notification.href
-    }));
+    const notifications = await DBNotification.find({ user: Types.ObjectId.createFromHexString(userId) });
+    return notifications.map(mapNotification);
 }
 
 const updateNotificationAsync = async (id: string, newData: UpdateFields<UserNotification>): Promise<boolean> => {
@@ -67,6 +50,17 @@ const deleteNotificationAsync = async (id: string): Promise<boolean> => {
     const result = await DBNotification.deleteOne({_id: Types.ObjectId.createFromHexString(id)});
     return result.deletedCount > 0;
 };
+
+const mapNotification = (dbDoc: NotificationSchema & { _id: Types.ObjectId }): UserNotification => {
+    return {
+        _id: dbDoc._id.toHexString(),
+        user: dbDoc.user.toHexString(),
+        dateTimestamp: dbDoc.dateTimestamp,
+        read: dbDoc.read,
+        text: dbDoc.text,
+        href: dbDoc.href
+    };
+}
 
 export {
     createNotificationAsync,

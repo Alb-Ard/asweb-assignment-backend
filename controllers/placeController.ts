@@ -1,7 +1,7 @@
 import { Schema, Types, model } from "mongoose";
 import Place from "../models/place";
 import Owner from "../models/owner";
-import { UpdateFields } from "../lib/db";
+import { UpdateFields, WithObjectId, withStringId } from "../lib/db";
 import Review from "../models/review";
 
 interface PlaceSchema {
@@ -37,12 +37,12 @@ const readAllPlacesAsync = async (page: number): Promise<Place[]> => {
     const places = await DBPlace.find({})
         .skip(pageSize * page)
         .limit(pageSize)
-        .populate<{ owner: Owner }>("owner", "username");
+        .populate<{ owner: WithObjectId<Owner> }>("owner", "username");
     return places.map(place => ({
         _id: place._id.toHexString(),
         name: place.name,
         description: place.description,
-        owner: place.owner,
+        owner: withStringId(place.owner),
         location: place.location,
         photoSrcs: place.photoSrcs,
         reviews: [],
@@ -54,12 +54,12 @@ const readUserPlacesAsync = async (ownerId: string, page: number): Promise<Place
     const places = await DBPlace.find({ owner: Types.ObjectId.createFromHexString(ownerId) })
         .skip(pageSize * page)
         .limit(pageSize)
-        .populate<{ owner: Owner }>("owner", "username");
+        .populate<{ owner: WithObjectId<Owner> }>("owner", "username");
     return places.map(place => ({
         _id: place._id.toHexString(),
         name: place.name,
         description: place.description,
-        owner: place.owner,
+        owner: withStringId(place.owner),
         location: place.location,
         photoSrcs: place.photoSrcs,
         reviews: [],
@@ -68,12 +68,12 @@ const readUserPlacesAsync = async (ownerId: string, page: number): Promise<Place
 
 const readPlaceAsync = async (id: string): Promise<Place | null> => {
     const place = await DBPlace.findOne({ _id: Types.ObjectId.createFromHexString(id) })
-        .populate<{ owner: Owner }>("owner", "username");
+        .populate<{ owner: WithObjectId<Owner> }>("owner", "username");
     return !!place ? {
         _id: place._id.toHexString(),
         name: place.name,
         description: place.description,
-        owner: place.owner,
+        owner: withStringId(place.owner),
         location: place.location,
         photoSrcs: place.photoSrcs,
         reviews: [],

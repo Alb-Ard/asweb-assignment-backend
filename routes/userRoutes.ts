@@ -10,10 +10,10 @@ import { deleteNotificationAsync, readNotificationAsync, readUserNotificationsAs
 
 const userRoutes = express.Router();
 
-userRoutes.get("/api/user/notification", async (request, response) => { 
+userRoutes.get("/api/user/:id/notification", async (request, response) => { 
     try {
         const sessionUserId = await getSessionUserAsync(getSessionToken(request.headers.cookie));
-        if (!!!sessionUserId) {
+        if (!!!sessionUserId || sessionUserId != request.params.id) {
             response.sendStatus(401);
             return;
         }
@@ -145,14 +145,14 @@ userRoutes.patch("/api/user/:userId/notification/:notificationId", async (reques
             response.status(404).send("Notification not found");
             return;
         }
-        if (!(await checkOwnershipAsync(existingNotification._id, request.headers.cookie)) || !(await checkOwnershipAsync(request.params.userId, request.headers.cookie))) {
+        if (!(await checkOwnershipAsync(existingNotification.user, request.headers.cookie)) || !(await checkOwnershipAsync(request.params.userId, request.headers.cookie))) {
             response.sendStatus(401);
             return;
         }
         const newNotificationData = request.body as Partial<{
             _id: string,
             read: boolean,
-        }>
+        }>;
         if (!!!newNotificationData || (!!newNotificationData._id && newNotificationData._id != existingNotification._id)) {
             response.sendStatus(400);
             return;

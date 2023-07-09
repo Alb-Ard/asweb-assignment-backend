@@ -1,6 +1,6 @@
 import {model, Schema, Types} from "mongoose";
 import Review  from "../models/review";
-import {UpdateFields} from "../lib/db";
+import {UpdateFields, WithObjectId, withStringId} from "../lib/db";
 import Owner from "../models/owner";
 
 interface ReviewSchema {
@@ -27,10 +27,10 @@ const createReviewAsync = async (star: number, placeId: string, userId: string) 
 
 const readReviewAsync = async (placeId: string, userId: string): Promise<Review | null> => {
     const review = await DBReview.findOne({ place: Types.ObjectId.createFromHexString(placeId), user: Types.ObjectId.createFromHexString(userId) })
-        .populate<{ user: Owner }>("user", ["username"]);
+        .populate<{ user: WithObjectId<Owner> }>("user", ["username"]);
     return !!review ? {
         _id: review._id.toHexString(),
-        user: review.user,
+        user: withStringId(review.user),
         star: review.star,
     } : null;
 }
@@ -38,20 +38,20 @@ const readReviewAsync = async (placeId: string, userId: string): Promise<Review 
 
 const readPlaceReviewsAsync = async (placeId: string): Promise<Review[]> => {
     const reviews = await DBReview.find({ place: Types.ObjectId.createFromHexString(placeId) })
-        .populate<{ user: Owner }>("user", ["username"]);
+        .populate<{ user: WithObjectId<Owner> }>("user", ["username"]);
     return reviews.map(review => ({
         _id: review._id.toHexString(),
-        user: review.user,
+        user: withStringId(review.user),
         star: review.star,
     }));
 }
 
 const readUserReviewsAsync = async (userId: string): Promise<Review[]> => {
     const reviews = await DBReview.find({ user: Types.ObjectId.createFromHexString(userId) })
-        .populate<{ user: Owner }>("user", ["username"]);
+        .populate<{ user: WithObjectId<Owner> }>("user", ["username"]);
     return reviews.map(review => ({
         _id: review._id.toHexString(),
-        user: review.user,
+        user: withStringId(review.user),
         star: review.star,
     }));
 }

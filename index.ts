@@ -6,20 +6,25 @@ import bodyParser from "body-parser";
 import placeRoutes from "./routes/placeRoutes";
 import itineraryRoutes from "./routes/itinerariesRoutes";
 import { getSessionToken } from "./lib/auth";
+import { Server } from "socket.io";
+import { handleSocketConnectAsync, handleSocketDisconnectAsync } from "./lib/socket";
+
+const serverPort = 3001;
+const serverAddress = "0.0.0.0";
+const corsOptions = {
+    origin: "http://localhost:3000",
+    credentials: true
+};
 
 const connectToDbAsync = async () => {
     await mongoose.connect("mongodb+srv://root:root@cluster0.vsfjdvq.mongodb.net/?retryWrites=true&w=majority");
 }
 
-const startApp = async () => {
-    await connectToDbAsync();
+const createExpressApp = () => {
     const app = express();
     app.use(bodyParser.json());
     app.use(bodyParser.text());
-    app.use(cors({
-        origin: "http://localhost:3000",
-        credentials: true
-    }));
+    app.use(cors(corsOptions));
     app.use((req, res, next) => {
         console.log(`${req.method} to ${req.url} with token ${getSessionToken(req.headers.cookie)} with body ${JSON.stringify(req.body)}`);
         next();
@@ -27,7 +32,16 @@ const startApp = async () => {
     app.use(userRoutes);
     app.use(placeRoutes);
     app.use(itineraryRoutes);
-    app.listen(3001, "localhost", 1, () => console.log("Listening on localhost:3001"));
+    return app;
+}
+
+const startApp = async () => {
+    await connectToDbAsync();
+    const app = createExpressApp();
+    const server = app.listen(serverPort, serverAddress, 1, () => console.log(`Listening on ${serverAddress}:${serverPort}`));
+    const io = new Server(server, { cors: corsOptions });
+    io.on("connection", handleSocketConnectAsync);
+    io.on("disconnect", handleSocketDisconnectAsync);
 }
 
 startApp();

@@ -4,6 +4,7 @@ import { getSessionUserAsync } from "../controllers/sessionController";
 import { checkOwnershipAsync, getSessionToken } from "../lib/auth";
 import Place from "../models/place";
 import { createReviewAsync, deleteReviewAsync, readPlaceReviewsAsync, readReviewAsync, updateReviewAsync } from "../controllers/reviewController";
+import { notifyChangedReviewAsync, notifyNewReviewAsync } from "../lib/notify";
 
 const placeRoutes = express.Router();
 
@@ -51,6 +52,7 @@ placeRoutes.post("/api/place/:id/review", async (request, response) => {
         if (existingReview) {
             const success = await updateReviewAsync(existingReview._id, reviewData);
             response.status(success ? 200 : 500).send(success ? existingReview._id : "DB Error");
+            notifyChangedReviewAsync(placeId, sessionUserId);
             return;
         }
         const createdId = await createReviewAsync(reviewData.star, request.params.id, sessionUserId);
@@ -59,6 +61,7 @@ placeRoutes.post("/api/place/:id/review", async (request, response) => {
             return;
         }
         response.send(createdId);
+        notifyNewReviewAsync(placeId, sessionUserId);
     } catch (err) {
         console.error(err);
         response.status(500).send(err);

@@ -3,6 +3,7 @@ import { getSessionUserAsync } from "../controllers/sessionController";
 import { checkOwnershipAsync, getSessionToken } from "../lib/auth";
 import { createItineraryAsync, deleteItineraryAsync, readUserItinerariesAsync, readItineraryAsync, updateItineraryAsync } from "../controllers/itineraryController";
 import Itinerary from "../models/itinerary";
+import { notifyPlaceInItineraryAsync } from "../lib/notify";
 
 const itineraryRoutes = express.Router();
 
@@ -81,6 +82,7 @@ itineraryRoutes.post("/api/itinerary/:id/places", async (request, response) => {
         }
         const success = await updateItineraryAsync(itineraryId, { places: [...itinerary.places, placeId] });
         response.status(success ? 200 : 500).send(success ? "OK" : "DB Error");
+        notifyPlaceInItineraryAsync(placeId);
     } catch (err) {
         console.error(err);
         response.status(500).send(err);
