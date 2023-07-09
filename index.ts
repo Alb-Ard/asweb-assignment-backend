@@ -12,8 +12,9 @@ import { handleSocketConnectAsync, handleSocketDisconnectAsync } from "./lib/soc
 const devServerPort = 3000;
 const serverPort = 3001;
 const serverAddress = "0.0.0.0";
+const isDev = process.argv.includes("dev");
 const corsOptions = {
-    origin: "http://localhost:3000",
+    origin: `http://localhost:${isDev ? devServerPort : serverPort}`,
     credentials: true
 };
 
@@ -34,7 +35,6 @@ const createExpressApp = () => {
     app.use(placeRoutes);
     app.use(itineraryRoutes);
 
-    const isDev = process.argv.includes("dev");
     if (isDev) {
         console.log("Redirect to dev at port " + devServerPort + " enabled!");
         app.get("/*", (req, res) => {
