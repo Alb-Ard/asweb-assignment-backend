@@ -6,8 +6,24 @@ import { checkOwnershipAsync, getSessionToken } from "../lib/auth";
 import { deleteReviewAsync, readUserReviewsAsync } from "../controllers/reviewController";
 import { deleteItineraryAsync, readUserItinerariesAsync } from "../controllers/itineraryController";
 import { deletePlaceAsync, readUserPlacesAsync } from "../controllers/placeController";
+import { deleteNotificationAsync, readNotificationAsync, readUserNotificationsAsync, updateNotificationAsync } from "../controllers/notificationController";
 
 const userRoutes = express.Router();
+
+userRoutes.get("/api/user/notification", async (request, response) => { 
+    try {
+        const sessionUserId = await getSessionUserAsync(getSessionToken(request.headers.cookie));
+        if (!!!sessionUserId) {
+            response.sendStatus(401);
+            return;
+        }
+        const notifications = await readUserNotificationsAsync(sessionUserId);
+        response.send(notifications);
+    } catch (err) {
+        console.error(err);
+        response.status(500).send(err);
+    }
+});
 
 userRoutes.post("/api/user/register", async (request, response) => {
     try {
@@ -122,6 +138,51 @@ userRoutes.patch("/api/user/:id", async (request, response) => {
     }
 });
 
+userRoutes.patch("/api/user/:userId/notification/:notificationId", async (request, response) => {
+    try {
+        const existingNotification = await readNotificationAsync(request.params.notificationId);
+        if (!!!existingNotification) {
+            response.status(404).send("Notification not found");
+            return;
+        }
+        if (!(await checkOwnershipAsync(existingNotification._id, request.headers.cookie)) || !(await checkOwnershipAsync(request.params.userId, request.headers.cookie))) {
+            response.sendStatus(401);
+            return;
+        }
+        const newNotificationData = request.body as Partial<{
+            _id: string,
+            read: boolean,
+        }>
+        if (!!!newNotificationData || (!!newNotificationData._id && newNotificationData._id != existingNotification._id)) {
+            response.sendStatus(400);
+            return;
+        }
+        const success = await updateNotificationAsync(existingNotification._id, newNotificationData);
+        response.status(success ? 200 : 500).send(success ? "OK" : "DB Error");
+    } catch (err) {
+        console.error(err);
+        response.status(500).send(err);
+    }
+});
+
+userRoutes.delete("/api/user/:userId/notification/:notificationId", async (request, response) => {
+    try {
+        const existingNotification = await readNotificationAsync(request.params.notificationId);
+        if (!!!existingNotification) {
+            response.status(404).send("Notification not found");
+            return;
+        }
+        if (!(await checkOwnershipAsync(existingNotification._id, request.headers.cookie)) || !(await checkOwnershipAsync(request.params.userId, request.headers.cookie))) {
+            response.sendStatus(401);
+            return;
+        }
+        const success = await deleteNotificationAsync(existingNotification._id);
+        response.status(success ? 200 : 500).send(success ? "OK" : "DB Error");
+    } catch (err) {
+        console.error(err);
+        response.status(500).send(err);
+    }
+});
 
 userRoutes.delete("/api/user/:id", async (request, response) => {
     try {
