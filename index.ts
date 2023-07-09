@@ -37,8 +37,8 @@ const createExpressApp = () => {
     const isDev = process.argv.includes("dev");
     if (isDev) {
         console.log("Redirect to dev at port " + devServerPort + " enabled!");
-        app.get("/", (req, res) => {
-            res.redirect(`http://${req.hostname}:${devServerPort}`);
+        app.get("/*", (req, res) => {
+            res.redirect(req.url.replace("" + serverPort, "" + devServerPort));
         });
     } else {
         console.log("Started in production mode");
