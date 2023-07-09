@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "compile": "npx tsc --outDir .build",
-    "dev": "node .build/index.js",
-    "run": "npm run compile && npm run dev"
+    "dev": "npm run compile && node .build/index.js dev",
+    "prod": "npm run compile && node .build/index.js"
   },
   "author": "",
   "license": "ISC",

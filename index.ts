@@ -9,6 +9,7 @@ import { getSessionToken } from "./lib/auth";
 import { Server } from "socket.io";
 import { handleSocketConnectAsync, handleSocketDisconnectAsync } from "./lib/socket";
 
+const devServerPort = 3000;
 const serverPort = 3001;
 const serverAddress = "0.0.0.0";
 const corsOptions = {
@@ -32,6 +33,17 @@ const createExpressApp = () => {
     app.use(userRoutes);
     app.use(placeRoutes);
     app.use(itineraryRoutes);
+
+    for (const arg of process.argv) {
+        if (arg.includes("dev")) {
+            console.log("Redirect to dev at port " + devServerPort + " enabled!");
+            app.get("/", (req, res) => {
+                res.redirect(`http://${req.hostname}:${devServerPort}`);
+            });
+            break;
+        }
+    }
+
     return app;
 }
 
