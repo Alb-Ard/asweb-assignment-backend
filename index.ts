@@ -8,6 +8,7 @@ import itineraryRoutes from "./routes/itinerariesRoutes";
 import { getSessionToken } from "./lib/auth";
 import { Server } from "socket.io";
 import { handleSocketConnectAsync, handleSocketDisconnectAsync } from "./lib/socket";
+import { existsSync } from "fs";
 
 const devServerPort = 3000;
 const serverPort = 3001;
@@ -44,7 +45,12 @@ const createExpressApp = () => {
         console.log("Started in production mode");
         app.use(express.static("static"));
         app.get("/*", (req, res, next) => {
-            res.sendFile(__dirname + "/static/" + req.path);
+            const filePath = __dirname + "/static/" + req.path;
+            if (existsSync(filePath)) {
+                res.sendFile(__dirname + "/static/" + req.path);
+            } else {
+                res.sendFile(__dirname + "/static/404.html");
+            }
         });
     }
 
