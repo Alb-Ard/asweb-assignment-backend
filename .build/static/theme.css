@@ -1,0 +1,115 @@
+@import url("https://fonts.googleapis.com/css2?family=Geologica:wght@100;200;300;400;500;600;700;800;900&display=switch");
+
+:root {
+    --color-grey-saturation: 10%;
+    --color-primary-hue: 190;
+    --color-warning-hue: 40;
+    --color-danger-hue: 5;
+
+    --color-grey-100: hsl(var(--color-primary-hue), var(--color-grey-saturation), 10%);
+    --color-grey-200: hsl(var(--color-primary-hue), var(--color-grey-saturation), 20%);
+    --color-grey-300: hsl(var(--color-primary-hue), var(--color-grey-saturation), 30%);
+    --color-grey-400: hsl(var(--color-primary-hue), var(--color-grey-saturation), 40%);
+    --color-grey-500: hsl(var(--color-primary-hue), var(--color-grey-saturation), 50%);
+    --color-grey-600: hsl(var(--color-primary-hue), var(--color-grey-saturation), 60%);
+    --color-grey-700: hsl(var(--color-primary-hue), var(--color-grey-saturation), 70%);
+    --color-grey-800: hsl(var(--color-primary-hue), var(--color-grey-saturation), 80%);
+    --color-grey-900: hsl(var(--color-primary-hue), var(--color-grey-saturation), 90%);
+
+    --color-primary-100: hsl(var(--color-primary-hue), 60%, 10%);
+    --color-primary-200: hsl(var(--color-primary-hue), 60%, 20%);
+    --color-primary-300: hsl(var(--color-primary-hue), 60%, 30%);
+    --color-primary-400: hsl(var(--color-primary-hue), 60%, 40%);
+    --color-primary-500: hsl(var(--color-primary-hue), 60%, 50%);
+    --color-primary-600: hsl(var(--color-primary-hue), 60%, 60%);
+    --color-primary-700: hsl(var(--color-primary-hue), 60%, 70%);
+    --color-primary-800: hsl(var(--color-primary-hue), 60%, 80%);
+    --color-primary-900: hsl(var(--color-primary-hue), 60%, 90%);
+
+    --color-warning-100: hsl(var(--color-warning-hue), 100%, 10%);
+    --color-warning-200: hsl(var(--color-warning-hue), 100%, 20%);
+    --color-warning-300: hsl(var(--color-warning-hue), 100%, 30%);
+    --color-warning-400: hsl(var(--color-warning-hue), 100%, 40%);
+    --color-warning-500: hsl(var(--color-warning-hue), 100%, 50%);
+    --color-warning-600: hsl(var(--color-warning-hue), 100%, 60%);
+    --color-warning-700: hsl(var(--color-warning-hue), 100%, 70%);
+    --color-warning-800: hsl(var(--color-warning-hue), 100%, 80%);
+    --color-warning-900: hsl(var(--color-warning-hue), 100%, 90%);
+
+    --color-danger-100: hsl(var(--color-danger-hue), 100%, 10%);
+    --color-danger-200: hsl(var(--color-danger-hue), 100%, 20%);
+    --color-danger-300: hsl(var(--color-danger-hue), 100%, 30%);
+    --color-danger-400: hsl(var(--color-danger-hue), 100%, 40%);
+    --color-danger-500: hsl(var(--color-danger-hue), 100%, 50%);
+    --color-danger-600: hsl(var(--color-danger-hue), 100%, 60%);
+    --color-danger-700: hsl(var(--color-danger-hue), 100%, 70%);
+    --color-danger-800: hsl(var(--color-danger-hue), 100%, 80%);
+    --color-danger-900: hsl(var(--color-danger-hue), 100%, 90%);
+
+    --color-on-100: var(--color-grey-900);
+    --color-on-200: var(--color-grey-900);
+    --color-on-300: var(--color-grey-900);
+    --color-on-400: var(--color-grey-900);
+    --color-on-500: var(--color-grey-900);
+    --color-on-600: var(--color-grey-100);
+    --color-on-700: var(--color-grey-100);
+    --color-on-800: var(--color-grey-100);
+    --color-on-900: var(--color-grey-100);
+
+    --color-background: var(--color-grey-900);
+    --color-foreground: var(--color-on-900);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+
+        --color-grey-100: hsl(var(--color-primary-hue), var(--color-grey-saturation), 90%);
+        --color-grey-200: hsl(var(--color-primary-hue), var(--color-grey-saturation), 80%);
+        --color-grey-300: hsl(var(--color-primary-hue), var(--color-grey-saturation), 70%);
+        --color-grey-400: hsl(var(--color-primary-hue), var(--color-grey-saturation), 60%);
+        --color-grey-500: hsl(var(--color-primary-hue), var(--color-grey-saturation), 50%);
+        --color-grey-600: hsl(var(--color-primary-hue), var(--color-grey-saturation), 40%);
+        --color-grey-700: hsl(var(--color-primary-hue), var(--color-grey-saturation), 30%);
+        --color-grey-800: hsl(var(--color-primary-hue), var(--color-grey-saturation), 20%);
+        --color-grey-900: hsl(var(--color-primary-hue), var(--color-grey-saturation), 10%);
+
+        --color-primary-100: hsl(var(--color-primary-hue), 60%, 90%);
+        --color-primary-200: hsl(var(--color-primary-hue), 60%, 80%);
+        --color-primary-300: hsl(var(--color-primary-hue), 60%, 70%);
+        --color-primary-400: hsl(var(--color-primary-hue), 60%, 60%);
+        --color-primary-500: hsl(var(--color-primary-hue), 60%, 50%);
+        --color-primary-600: hsl(var(--color-primary-hue), 60%, 40%);
+        --color-primary-700: hsl(var(--color-primary-hue), 60%, 30%);
+        --color-primary-800: hsl(var(--color-primary-hue), 60%, 20%);
+        --color-primary-900: hsl(var(--color-primary-hue), 60%, 10%);
+
+        --color-warning-100: hsl(var(--color-warning-hue), 100%, 90%);
+        --color-warning-200: hsl(var(--color-warning-hue), 100%, 80%);
+        --color-warning-300: hsl(var(--color-warning-hue), 100%, 70%);
+        --color-warning-400: hsl(var(--color-warning-hue), 100%, 60%);
+        --color-warning-500: hsl(var(--color-warning-hue), 100%, 50%);
+        --color-warning-600: hsl(var(--color-warning-hue), 100%, 40%);
+        --color-warning-700: hsl(var(--color-warning-hue), 100%, 30%);
+        --color-warning-800: hsl(var(--color-warning-hue), 100%, 20%);
+        --color-warning-900: hsl(var(--color-warning-hue), 100%, 10%);
+
+        --color-danger-100: hsl(var(--color-danger-hue), 100%, 90%);
+        --color-danger-200: hsl(var(--color-danger-hue), 100%, 80%);
+        --color-danger-300: hsl(var(--color-danger-hue), 100%, 70%);
+        --color-danger-400: hsl(var(--color-danger-hue), 100%, 60%);
+        --color-danger-500: hsl(var(--color-danger-hue), 100%, 50%);
+        --color-danger-600: hsl(var(--color-danger-hue), 100%, 40%);
+        --color-danger-700: hsl(var(--color-danger-hue), 100%, 30%);
+        --color-danger-800: hsl(var(--color-danger-hue), 100%, 20%);
+        --color-danger-900: hsl(var(--color-danger-hue), 100%, 10%);
+    }
+}
+
+html,
+body {
+    font-family: "Geologica", sans-serif;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    fill: var(--color-foreground);
+    color-scheme: light dark;
+}
