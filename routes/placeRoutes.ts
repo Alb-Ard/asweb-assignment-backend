@@ -120,17 +120,17 @@ placeRoutes.get("/api/place/:placeId/review/:reviewId", async (request, response
 
 placeRoutes.patch("/api/place/:id", async (request, response) => {
     try {
-        const place = request.body as Partial<Place> & { _id: string };
+        const place = request.body as Partial<Place>;
         if (!!!place) {
             response.sendStatus(400);
             return;
         }
         const { _id: placeId, ...placeData } = place;
-        if (place._id !== request.params.id) {
+        if (!!placeId && placeId !== request.params.id) {
             response.sendStatus(400);
             return;
         }
-        const existingPlace = await readPlaceAsync(place._id);
+        const existingPlace = await readPlaceAsync(request.params.id);
         if (!!!existingPlace) {
             response.sendStatus(404);
             return;
@@ -139,7 +139,7 @@ placeRoutes.patch("/api/place/:id", async (request, response) => {
             response.sendStatus(401);
             return;
         }
-        const success = await updatePlaceAsync(placeId, placeData);
+        const success = await updatePlaceAsync(request.params.id, placeData);
         response.status(success ? 200 : 500).send(success ? "OK" : "DB Error");
     } catch (err) {
         console.error(err);
