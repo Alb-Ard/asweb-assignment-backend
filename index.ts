@@ -39,7 +39,9 @@ const createExpressApp = () => {
     if (isDev) {
         console.log("Redirect to dev at port " + devServerPort + " enabled!");
         app.get("/*", (req, res) => {
-            res.redirect(req.url.replace("" + serverPort, "" + devServerPort));
+            const redirectUrl = req.headers.host + req.url.replace("" + serverPort, "" + devServerPort);
+            console.log("Request for page redirected to \"" + redirectUrl + "\"");
+            res.redirect(redirectUrl);
         });
     } else {
         console.log("Started in production mode");
