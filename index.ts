@@ -10,10 +10,10 @@ import { Server } from "socket.io";
 import { handleSocketConnectAsync, handleSocketDisconnectAsync } from "./lib/socket";
 import { existsSync } from "fs";
 
-const devServerPort = 3000;
-const serverPort = 3001;
-const serverAddress = "0.0.0.0";
 const isDev = process.argv.includes("dev");
+const devServerPort = 3000;
+const serverPort = isDev ? 3001 : Number(process.env.PORT ?? "80");
+const serverAddress = "0.0.0.0";
 const corsOptions = {
     origin: `http://localhost:${isDev ? devServerPort : serverPort}`,
     credentials: true

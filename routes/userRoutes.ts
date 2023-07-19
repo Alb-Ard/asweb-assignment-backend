@@ -63,7 +63,7 @@ userRoutes.post("/api/user/login", async (request, response) => {
                 expires: new Date(sessionToken.expiry),
                 sameSite: "none",
                 httpOnly: true,
-                secure: true,
+                secure: false,
             })
             .send(userData);
     } catch (err) {

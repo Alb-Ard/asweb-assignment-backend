@@ -13,10 +13,11 @@ const itinerariesRoutes_1 = __importDefault(require("./routes/itinerariesRoutes"
 const auth_1 = require("./lib/auth");
 const socket_io_1 = require("socket.io");
 const socket_1 = require("./lib/socket");
-const devServerPort = 3000;
-const serverPort = 3001;
-const serverAddress = "0.0.0.0";
+const fs_1 = require("fs");
 const isDev = process.argv.includes("dev");
+const devServerPort = 3000;
+const serverPort = isDev ? 3001 : Number(process.env.PORT ?? "80");
+const serverAddress = "0.0.0.0";
 const corsOptions = {
     origin: `http://localhost:${isDev ? devServerPort : serverPort}`,
     credentials: true
@@ -39,14 +40,22 @@ const createExpressApp = () => {
     if (isDev) {
         console.log("Redirect to dev at port " + devServerPort + " enabled!");
         app.get("/*", (req, res) => {
-            res.redirect(req.url.replace("" + serverPort, "" + devServerPort));
+            const redirectUrl = req.headers.host + req.url.replace("" + serverPort, "" + devServerPort);
+            console.log("Request for page redirected to \"" + redirectUrl + "\"");
+            res.redirect(redirectUrl);
         });
     }
     else {
         console.log("Started in production mode");
         app.use(express_1.default.static("static"));
         app.get("/*", (req, res, next) => {
-            res.sendFile(__dirname + "/static/" + req.path);
+            const filePath = __dirname + "/static/" + req.path;
+            if ((0, fs_1.existsSync)(filePath)) {
+                res.sendFile(__dirname + "/static/" + req.path);
+            }
+            else {
+                res.sendFile(__dirname + "/static/404.html");
+            }
         });
     }
     return app;
